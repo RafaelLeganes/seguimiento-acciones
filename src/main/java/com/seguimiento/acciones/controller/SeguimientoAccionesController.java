@@ -2,25 +2,24 @@ package com.seguimiento.acciones.controller;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.opencsv.CSVReader;
 import com.seguimiento.acciones.model.Accion;
-import com.seguimiento.acciones.utilities.FileResourceUtils;
+
 
 public class SeguimientoAccionesController {
 	
 	public void descargarFicheroCSV(String nombre, String url) {
 		try(BufferedInputStream in = new BufferedInputStream(new URL(url).openStream()) ;
-			FileOutputStream fileOutputStream = new FileOutputStream(nombre+".csv")) {
+			FileOutputStream fileOutputStream = new FileOutputStream("C:/Users/Administrador.LIFERAY/Desktop/examen/"+nombre+".csv")) {
 			byte dataBuffer[] = new byte[1024];
 			int bytesRead;
 			while((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -34,13 +33,21 @@ public class SeguimientoAccionesController {
 	
 	public List<Accion> leerFicheroCSV(String nombreFichero){
 		List<Accion> listaAcciones = new ArrayList<Accion>();
-		FileResourceUtils app = new FileResourceUtils();
-		InputStream is = app.getFileFromResourceAsStream(nombreFichero);
-		try(CSVReader reader = new CSVReader(new InputStreamReader(is, "UTF-8"),',')){
+		try(CSVReader reader = new CSVReader(new FileReader("C:/Users/Administrador.LIFERAY/Desktop/examen/"+nombreFichero),',')){
 			String[] nextLine = null;
 			reader.readNext();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+			LocalDateTime ahora = LocalDateTime.now();
+			String hora= String.valueOf(ahora.getHour());
+			if(hora.length()==1) {
+				hora = 0+hora;
+			}
+			String minutos = String.valueOf(ahora.getMinute());
+			if(minutos.length()==1) {
+				minutos = 0+minutos;
+			}
 			while((nextLine = reader.readNext()) != null) {
-				LocalDate date = LocalDate.parse(nextLine[0]);
+				LocalDateTime date = LocalDateTime.parse(nextLine[0]+" "+hora+":"+minutos,formatter);
 				Accion accion = new Accion(date, new BigDecimal(nextLine[4]));
 				listaAcciones .add(accion);
 			}
