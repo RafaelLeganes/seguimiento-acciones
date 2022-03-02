@@ -8,8 +8,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+
 
 import com.opencsv.CSVReader;
 import com.seguimiento.acciones.model.Accion;
@@ -31,8 +30,8 @@ public class SeguimientoAccionesController {
 		} 
 	}
 	
-	public List<Accion> leerFicheroCSV(String nombreFichero){
-		List<Accion> listaAcciones = new ArrayList<Accion>();
+	public Accion leerFicheroCSV(String nombreFichero){
+		Accion accion = null;
 		try(CSVReader reader = new CSVReader(new FileReader("C:/Users/Administrador.LIFERAY/Desktop/examen/"+nombreFichero),',')){
 			String[] nextLine = null;
 			reader.readNext();
@@ -48,13 +47,13 @@ public class SeguimientoAccionesController {
 			}
 			while((nextLine = reader.readNext()) != null) {
 				LocalDateTime date = LocalDateTime.parse(nextLine[0]+" "+hora+":"+minutos,formatter);
-				Accion accion = new Accion(date, new BigDecimal(nextLine[4]));
-				listaAcciones .add(accion);
+				accion = new Accion(date, new BigDecimal(nextLine[4]), nombreFichero);
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return listaAcciones;
+		return accion;
 	}
 
 }

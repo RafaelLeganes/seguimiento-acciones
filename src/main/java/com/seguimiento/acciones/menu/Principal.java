@@ -35,21 +35,21 @@ public class Principal extends TimerTask{
 		InputStream is = app.getFileFromResourceAsStream("configuration.properties");
 		Properties appProps = new Properties();
 		ExecutorService executor = null;
-
 		try {
 			appProps.load(is);
 			Set<String> listapropiedades = appProps.stringPropertyNames();
 			int cantidadAcciones = listapropiedades.size();
 			executor = Executors.newFixedThreadPool(cantidadAcciones);
-			Collection<Callable<String>> callables = new ArrayList<>();
+			Collection<Callable<Accion>> callables = new ArrayList<>();
 			for (Iterator<String> it = listapropiedades.iterator(); it.hasNext();) {
 				String value = (String) it.next();
 				String url = appProps.getProperty(value);
 				callables.add(() -> procesarFichero(value, url));
 			}
-			List<Future<String>> result = executor.invokeAll(callables);
-			for (Future<String> f : result) {
-				System.out.println(f.get());
+			List<Future<Accion>> result = executor.invokeAll(callables);
+			for (Future<Accion> f : result) {
+				Accion acc = f.get();
+					System.out.println("Nombre Accion:"+acc.getNombre()+" Fecha:"+acc.getFecha() + " Valor Cierre" +acc.getValorAccionCierre());
 			}
 		} catch (IOException | InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
@@ -58,18 +58,14 @@ public class Principal extends TimerTask{
 
 		executor.shutdown();
 		System.out.println("Te veo en 10 segundos");
-		
 	}
 	
-	private static String procesarFichero(String nombre, String url) {
-		List<Accion> listaAcciones = new ArrayList<Accion>();
-		String msg = null;
+	private static Accion procesarFichero(String nombre, String url) {
+		Accion accion = null;
 		SeguimientoAccionesController controller = new SeguimientoAccionesController();
 		controller.descargarFicheroCSV(nombre, url);
-		listaAcciones = controller.leerFicheroCSV(nombre + ".csv");
-		msg = "Acciones de " + nombre + " con Fecha:" + listaAcciones.get(listaAcciones.size() - 1).getFecha()
-				+ " Valor cierre:" + listaAcciones.get(listaAcciones.size() - 1).getValorAccionCierre();
-		return msg;
+		accion = controller.leerFicheroCSV(nombre + ".csv");
+		return accion;
 	}
 
 }
