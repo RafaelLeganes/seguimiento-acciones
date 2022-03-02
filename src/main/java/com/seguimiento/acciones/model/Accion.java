@@ -1,24 +1,24 @@
 package com.seguimiento.acciones.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Accion {
 	
-	private LocalDate fecha;
+	private LocalDateTime fecha;
 	private BigDecimal valorAccionCierre;
 	
-	public Accion(LocalDate fecha, BigDecimal valorAccionCierre) {
+	public Accion(LocalDateTime fecha, BigDecimal valorAccionCierre) {
 		super();
 		this.fecha = fecha;
 		this.valorAccionCierre = valorAccionCierre;
 	}
 
-	public LocalDate getFecha() {
+	public LocalDateTime getFecha() {
 		return fecha;
 	}
 
-	public void setFecha(LocalDate fecha) {
+	public void setFecha(LocalDateTime fecha) {
 		this.fecha = fecha;
 	}
 
