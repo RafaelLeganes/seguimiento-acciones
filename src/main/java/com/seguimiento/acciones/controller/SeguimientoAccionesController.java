@@ -47,7 +47,7 @@ public class SeguimientoAccionesController {
 			}
 			while((nextLine = reader.readNext()) != null) {
 				LocalDateTime date = LocalDateTime.parse(nextLine[0]+" "+hora+":"+minutos,formatter);
-				accion = new Accion(date, new BigDecimal(nextLine[4]), nombreFichero);
+				accion = new Accion(date, new BigDecimal(nextLine[4]), nombreFichero.replace(".csv", ""));
 
 			}
 		} catch (IOException e) {
