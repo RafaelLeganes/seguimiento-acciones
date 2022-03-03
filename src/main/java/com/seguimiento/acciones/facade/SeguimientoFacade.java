@@ -8,21 +8,49 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import com.seguimiento.acciones.controller.SeguimientoAccionesController;
 import com.seguimiento.acciones.model.Accion;
 import com.seguimiento.acciones.utilities.FileResourceUtils;
 
-public class SeguimientoFacade extends TimerTask{
+@Configuration
+@EnableAsync
+@EnableScheduling
+@Component
+public class SeguimientoFacade {
 
-	@Override
-	public void run() {
+	private static boolean done =false;
+	
+	public static boolean isDone() {
+		return done;
+	}
+	
+	public synchronized void pararPrincipal() {
+		while(!SeguimientoFacade.isDone()) {
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+
+	
+	@Scheduled(fixedRate =10000)
+	public void obtenerResultados() throws Exception{
 		FileResourceUtils app = new FileResourceUtils();
 		InputStream is = app.getFileFromResourceAsStream("configuration.properties");
 		Properties appProps = new Properties();
@@ -44,15 +72,15 @@ public class SeguimientoFacade extends TimerTask{
 					System.out.println("Nombre Accion:"+acc.getNombre()+" Fecha:"+acc.getFecha() + " Valor Cierre:" +acc.getValorAccionCierre());
 			}
 		} catch (IOException | InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new Exception("No se pudo obtener resultados! ");
 		}
 
 		executor.shutdown();
 		System.out.println("Te veo en 10 segundos");
 	}
 	
-	private static Accion procesarFichero(String nombre, String url) {
+	private static Accion procesarFichero(String nombre, String url) throws Exception{
 		Accion accion = null;
 		SeguimientoAccionesController controller = new SeguimientoAccionesController();
 		controller.descargarFicheroCSV(nombre, url);
