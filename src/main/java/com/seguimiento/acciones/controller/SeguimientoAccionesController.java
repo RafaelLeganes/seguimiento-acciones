@@ -16,7 +16,7 @@ import com.seguimiento.acciones.model.Accion;
 
 public class SeguimientoAccionesController {
 	
-	public void descargarFicheroCSV(String nombre, String url) {
+	public void descargarFicheroCSV(String nombre, String url) throws IOException{
 		try(BufferedInputStream in = new BufferedInputStream(new URL(url).openStream()) ;
 			FileOutputStream fileOutputStream = new FileOutputStream("C:/Users/Administrador.LIFERAY/Desktop/examen/"+nombre+".csv")) {
 			byte dataBuffer[] = new byte[1024];
@@ -25,12 +25,12 @@ public class SeguimientoAccionesController {
 				fileOutputStream.write(dataBuffer, 0, bytesRead);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new IOException("Archivo no descargado! "+ nombre);
 		} 
 	}
 	
-	public Accion leerFicheroCSV(String nombreFichero){
+	public Accion leerFicheroCSV(String nombreFichero) throws IOException{
 		Accion accion = null;
 		try(CSVReader reader = new CSVReader(new FileReader("C:/Users/Administrador.LIFERAY/Desktop/examen/"+nombreFichero),',')){
 			String[] nextLine = null;
@@ -52,6 +52,7 @@ public class SeguimientoAccionesController {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw new IOException("Archivo no leido! "+ nombreFichero);
 		}
 		return accion;
 	}
